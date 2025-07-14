@@ -45,14 +45,17 @@ export default function RootLayout({
       >
         <ClerkProvider>
           <header className="flex justify-end items-center p-4 border-b bg-white/80 backdrop-blur sticky top-0 z-50">
-            <SignedOut>
-              <Link href="/sign-in" className="mr-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Sign In</Link>
-              <Link href="/sign-up" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">Sign Up</Link>
-            </SignedOut>
-            <SignedIn>
-              <UserSyncer />
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
+            <div className="flex items-center gap-2 ml-auto">
+              <SignedIn>
+                <Link href="/profile" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Profile</Link>
+                <UserSyncer />
+                <UserButton afterSignOutUrl="/" />
+              </SignedIn>
+              <SignedOut>
+                <Link href="/sign-in" className="mr-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Sign In</Link>
+                <Link href="/sign-up" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">Sign Up</Link>
+              </SignedOut>
+            </div>
           </header>
           {children}
         </ClerkProvider>
