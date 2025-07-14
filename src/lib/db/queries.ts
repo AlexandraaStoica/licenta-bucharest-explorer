@@ -1,5 +1,5 @@
 import { db } from './index';
-import { eq, and, desc, asc, sql, gte, lte } from 'drizzle-orm';
+import { eq, and, desc, asc, sql, gte } from 'drizzle-orm';
 import {
   users,
   categories,
@@ -344,7 +344,7 @@ export async function createItineraryReview(reviewData: {
     where: eq(itineraryReviews.itineraryId, reviewData.itineraryId),
   });
   
-  const avgRating = allItineraryReviews.reduce((sum: number, r: any) => sum + r.rating, 0) / allItineraryReviews.length;
+  const avgRating = allItineraryReviews.reduce((sum: number, r) => sum + r.rating, 0) / allItineraryReviews.length;
   
   await db.update(itineraries)
     .set({

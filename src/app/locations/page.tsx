@@ -1,12 +1,16 @@
 import { Suspense } from 'react';
-import { Search, Filter, MapPin, Star, Clock } from 'lucide-react';
-import { getAllCategories } from '@/lib/db/queries';
-import { formatPrice, getRatingColor, getOpeningHoursStatus, getPriceRangeColor } from '@/lib/utils';
+import { Search, Filter, MapPin, Star } from 'lucide-react';
+import { getAllCategories, getAllLocations } from '@/lib/db/queries';
+import { getRatingColor, getPriceRangeColor } from '@/lib/utils';
+import Link from 'next/link';
+import Image from 'next/image';
 
 async function LocationsList() {
-  const categories = await getAllCategories();
+  const [categories, locations] = await Promise.all([
+    getAllCategories(),
+    getAllLocations()
+  ]);
   
-  // For now, we'll show a placeholder since we need to set up the database
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="text-center mb-12">
@@ -14,7 +18,7 @@ async function LocationsList() {
           Explore Bucharest
         </h1>
         <p className="text-xl text-gray-600">
-          Discover amazing places to visit in Romania's capital
+          Discover amazing places to visit in Romania&apos;s capital
         </p>
       </div>
 
@@ -63,124 +67,73 @@ async function LocationsList() {
         </div>
       </div>
 
-      {/* Sample Locations Grid */}
+      {/* Locations Grid */}
       <div>
-        <h2 className="text-2xl font-semibold text-gray-900 mb-6">Popular Locations</h2>
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[
-            {
-              id: '1',
-              name: 'National Museum of Art of Romania',
-              description: 'The largest art museum in Romania, housed in the former Royal Palace',
-              category: 'Museums',
-              address: 'Calea Victoriei 49-53, București',
-              rating: 4.5,
-              priceRange: '€€',
-              isOpen: true,
-              image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop'
-            },
-            {
-              id: '2',
-              name: 'Palace of the Parliament',
-              description: 'The world\'s heaviest building and the largest parliament building',
-              category: 'Historical Buildings',
-              address: 'Strada Izvor 2-4, București',
-              rating: 4.3,
-              priceRange: '€€€',
-              isOpen: true,
-              image: 'https://images.unsplash.com/photo-1502602898536-47ad22581b52?w=400&h=300&fit=crop'
-            },
-            {
-              id: '3',
-              name: 'Caru\' cu Bere',
-              description: 'Historic restaurant serving traditional Romanian cuisine since 1879',
-              category: 'Restaurants',
-              address: 'Strada Stavropoleos 5, București',
-              rating: 4.7,
-              priceRange: '€€€',
-              isOpen: true,
-              image: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&h=300&fit=crop'
-            },
-            {
-              id: '4',
-              name: 'Herăstrău Park',
-              description: 'Large urban park with a lake, perfect for walking and recreation',
-              category: 'Parks & Gardens',
-              address: 'Bulevardul Eroilor, București',
-              rating: 4.6,
-              priceRange: 'Free',
-              isOpen: true,
-              image: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop'
-            },
-            {
-              id: '5',
-              name: 'Control Club',
-              description: 'Popular alternative music venue and club',
-              category: 'Nightlife',
-              address: 'Strada Constantin Mille 4, București',
-              rating: 4.2,
-              priceRange: '€€',
-              isOpen: false,
-              image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop'
-            },
-            {
-              id: '6',
-              name: 'Stavropoleos Monastery',
-              description: 'Beautiful Orthodox monastery with stunning architecture',
-              category: 'Historical Buildings',
-              address: 'Strada Stavropoleos 4, București',
-              rating: 4.4,
-              priceRange: 'Free',
-              isOpen: true,
-              image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop'
-            }
-          ].map((location) => (
-            <div key={location.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
-              <div className="h-48 bg-gray-200 relative">
-                <img
-                  src={location.image}
-                  alt={location.name}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute top-3 right-3">
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                    location.isOpen ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                  }`}>
-                    {location.isOpen ? 'Open' : 'Closed'}
-                  </span>
-                </div>
-              </div>
-              <div className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
-                    {location.name}
-                  </h3>
-                  <div className="flex items-center">
-                    <Star className={`h-4 w-4 ${getRatingColor(location.rating)}`} />
-                    <span className="ml-1 text-sm font-medium text-gray-700">
-                      {location.rating}
+        <h2 className="text-2xl font-semibold text-gray-900 mb-6">
+          {locations.length > 0 ? 'Popular Locations' : 'No Locations Found'}
+        </h2>
+        {locations.length > 0 ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {locations.map((location) => {
+              const averageRating = location.reviews.length > 0 
+                ? location.reviews.reduce((sum, review) => sum + review.rating, 0) / location.reviews.length
+                : 0;
+              const isOpen = true;
+              return (
+                <Link key={location.id} href={`/locations/${location.id}`} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200 block">
+                  <div className="h-48 bg-gray-200 relative">
+                    <Image
+                      src={(location.images as string[] | undefined)?.[0] || 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop'}
+                      alt={location.name}
+                      className="w-full h-full object-cover"
+                      fill
+                      style={{objectFit: 'cover'}}
+                    />
+                    <div className="absolute top-3 right-3">
+                      <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        isOpen ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      }`}>
+                        {isOpen ? 'Open' : 'Closed'}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-lg font-semibold text-gray-900 line-clamp-1">
+                      {location.name}
+                    </h3>
+                    <div className="flex items-center">
+                      <Star className={`h-4 w-4 ${getRatingColor(averageRating)}`} />
+                      <span className="ml-1 text-sm font-medium text-gray-700">
+                        {averageRating > 0 ? averageRating.toFixed(1) : 'No ratings'}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                    {location.description}
+                  </p>
+                  <div className="flex items-center text-sm text-gray-500 mb-3">
+                    <MapPin className="h-4 w-4 mr-1" />
+                    <span className="line-clamp-1">{location.address}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-gray-700">
+                      {location.category?.name || 'Uncategorized'}
+                    </span>
+                    <span className={`text-sm font-medium ${getPriceRangeColor(location.priceRange || '€€')}`}>
+                      {location.priceRange || '€€'}
                     </span>
                   </div>
-                </div>
-                <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-                  {location.description}
-                </p>
-                <div className="flex items-center text-sm text-gray-500 mb-3">
-                  <MapPin className="h-4 w-4 mr-1" />
-                  <span className="line-clamp-1">{location.address}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700">
-                    {location.category}
-                  </span>
-                  <span className={`text-sm font-medium ${getPriceRangeColor(location.priceRange)}`}>
-                    {location.priceRange}
-                  </span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+                </Link>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-6xl mb-4">📍</div>
+            <h3 className="text-xl font-medium text-gray-900 mb-2">No locations found</h3>
+            <p className="text-gray-600">Check back later for new locations to explore!</p>
+          </div>
+        )}
       </div>
     </div>
   );

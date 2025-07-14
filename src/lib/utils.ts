@@ -104,7 +104,7 @@ export function isValidEmail(email: string): boolean {
   return emailRegex.test(email);
 }
 
-export function debounce<T extends (...args: any[]) => any>(
+export function debounce<T extends (...args: unknown[]) => unknown>(
   func: T,
   wait: number
 ): (...args: Parameters<T>) => void {
@@ -115,7 +115,7 @@ export function debounce<T extends (...args: any[]) => any>(
   };
 }
 
-export function throttle<T extends (...args: any[]) => any>(
+export function throttle<T extends (...args: unknown[]) => unknown>(
   func: T,
   limit: number
 ): (...args: Parameters<T>) => void {
@@ -129,7 +129,7 @@ export function throttle<T extends (...args: any[]) => any>(
   };
 }
 
-export function getOpeningHoursStatus(openingHours: any): {
+export function getOpeningHoursStatus(openingHours: unknown): {
   isOpen: boolean;
   status: string;
 } {
@@ -145,7 +145,7 @@ export function getOpeningHoursStatus(openingHours: any): {
     hour12: false,
   });
 
-  const todayHours = openingHours[dayName];
+  const todayHours = (openingHours as Record<string, { open: string; close: string }>)[dayName];
   if (!todayHours) {
     return { isOpen: false, status: 'Closed today' };
   }

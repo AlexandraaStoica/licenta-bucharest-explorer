@@ -5,6 +5,18 @@ export async function seed() {
   try {
     console.log('🌱 Seeding database...');
 
+    // Check if data already exists
+    const existingCategories = await db.query.categories.findMany();
+    const existingLocations = await db.query.locations.findMany();
+    const existingEvents = await db.query.events.findMany();
+
+    if (existingCategories.length > 0 || existingLocations.length > 0 || existingEvents.length > 0) {
+      console.log('⚠️  Database already contains data. Skipping seed to prevent duplicates.');
+      console.log(`   Found: ${existingCategories.length} categories, ${existingLocations.length} locations, ${existingEvents.length} events`);
+      console.log('   Run "npx tsx src/lib/db/reset.ts" first if you want to start fresh.');
+      return;
+    }
+
     // Insert categories
     const categoryData = [
       { name: 'Museums', description: 'Art, history, and science museums', icon: 'museum', color: '#3B82F6' },

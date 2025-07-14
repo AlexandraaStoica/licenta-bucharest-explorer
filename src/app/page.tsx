@@ -16,7 +16,7 @@ export default function HomePage() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-600 mb-8 max-w-3xl mx-auto">
-              Explore the hidden gems of Romania's capital. From historic landmarks to vibrant nightlife, 
+              Explore the hidden gems of Romania&apos;s capital. From historic landmarks to vibrant nightlife, 
               create unforgettable experiences in the heart of Eastern Europe.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -48,7 +48,7 @@ export default function HomePage() {
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
               From planning your perfect itinerary to discovering local favorites, 
-              we've got everything covered for your Bucharest adventure.
+              we&apos;ve got everything covered for your Bucharest adventure.
             </p>
           </div>
 
@@ -112,7 +112,7 @@ export default function HomePage() {
               Explore by Category
             </h2>
             <p className="text-xl text-gray-600">
-              Find exactly what you're looking for in Bucharest
+              Find exactly what you&apos;re looking for in Bucharest
             </p>
           </div>
 
@@ -151,7 +151,7 @@ export default function HomePage() {
             Ready to explore Bucharest?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Start planning your perfect trip today and discover the magic of Romania's capital.
+            Start planning your perfect trip today and discover the magic of Romania&apos;s capital.
           </p>
           <Link
             href="/locations"

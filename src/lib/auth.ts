@@ -22,7 +22,7 @@ export const authConfig = {
 // Placeholder for Clerk middleware - will be properly configured
 export const authMiddleware = () => {
   // This will be replaced with actual Clerk middleware
-  return (req: any, res: any, next: any) => {
+  return (req: unknown, res: unknown, next: () => void) => {
     next();
   };
 }; 

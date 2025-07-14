@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     }
 
     const wh = new Webhook(webhookSecret);
-    let evt: any;
+    let evt: unknown;
 
     try {
       evt = wh.verify(payload, {
@@ -45,12 +45,12 @@ export async function POST(req: NextRequest) {
     }
 
     // Get the event type
-    const eventType = evt.type;
+    const eventType = (evt as { type: string }).type;
     console.log('Webhook event type:', eventType);
 
     // Handle user.created event
     if (eventType === 'user.created') {
-      const { id, email_addresses, first_name, last_name, image_url } = evt.data;
+      const { id, email_addresses, first_name, last_name, image_url } = (evt as { data: { id: string, email_addresses: { email_address: string }[], first_name: string, last_name: string, image_url: string } }).data;
       
       console.log('Creating user with data:', {
         id,
