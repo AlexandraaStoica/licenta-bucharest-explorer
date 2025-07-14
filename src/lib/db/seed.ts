@@ -11,7 +11,7 @@ export async function seed() {
     const existingEvents = await db.query.events.findMany();
 
     if (existingCategories.length > 0 || existingLocations.length > 0 || existingEvents.length > 0) {
-      console.log('⚠️  Database already contains data. Skipping seed to prevent duplicates.');
+      console.log('   Database already contains data. Skipping seed to prevent duplicates.');
       console.log(`   Found: ${existingCategories.length} categories, ${existingLocations.length} locations, ${existingEvents.length} events`);
       console.log('   Run "npx tsx src/lib/db/reset.ts" first if you want to start fresh.');
       return;
@@ -30,7 +30,7 @@ export async function seed() {
     ];
     console.log('Inserting categories:', categoryData);
     const insertedCategories = await db.insert(categories).values(categoryData).returning();
-    console.log(`✅ Inserted ${insertedCategories.length} categories`, insertedCategories);
+    console.log(`Inserted ${insertedCategories.length} categories`, insertedCategories);
 
     // Insert sample locations with proper string coordinates
     const locationData = [
@@ -53,7 +53,7 @@ export async function seed() {
           saturday: { open: '10:00', close: '18:00' },
           sunday: { open: '10:00', close: '18:00' },
         },
-        images: ['https://example.com/mnar1.jpg'],
+        images: ['https://upload.wikimedia.org/wikipedia/commons/2/2e/National_Museum_of_Art_of_Romania_2018.jpg'],
         tags: ['art', 'history', 'palace'],
       },
       {
@@ -75,7 +75,7 @@ export async function seed() {
           saturday: { open: '09:00', close: '17:00' },
           sunday: { open: '09:00', close: '17:00' },
         },
-        images: ['https://example.com/parliament1.jpg'],
+        images: ['https://upload.wikimedia.org/wikipedia/commons/7/7e/Palatul_Parlamentului_Bucuresti.jpg'],
         tags: ['parliament', 'architecture'],
       },
       {
@@ -97,13 +97,13 @@ export async function seed() {
           saturday: { open: '08:00', close: '23:00' },
           sunday: { open: '08:00', close: '23:00' },
         },
-        images: ['https://example.com/caru-cu-bere1.jpg'],
+        images: ['https://upload.wikimedia.org/wikipedia/commons/2/2a/Caru_Cu_Bere_Bucharest.jpg'],
         tags: ['traditional', 'romanian-cuisine'],
       },
     ];
     console.log('Inserting locations:', locationData);
     const insertedLocations = await db.insert(locations).values(locationData).returning();
-    console.log(`✅ Inserted ${insertedLocations.length} locations`, insertedLocations);
+    console.log(` Inserted ${insertedLocations.length} locations`, insertedLocations);
 
     // Insert sample events with future dates (August 2025 and later)
     const eventData = [
@@ -123,7 +123,7 @@ export async function seed() {
           email: 'info@bucharestfest.ro',
           phone: '+40 21 123 4567',
         },
-        images: ['https://example.com/bucharest-festival.jpg'],
+        images: ['https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80'],
         tags: ['festival', 'summer', 'music', 'art'],
       },
       {
@@ -142,7 +142,7 @@ export async function seed() {
           email: 'contact@mnar.arts.ro',
           phone: '+40 21 313 3030',
         },
-        images: ['https://example.com/night-museums.jpg'],
+        images: ['https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=800&q=80'],
         tags: ['museums', 'night', 'exhibition'],
       },
       {
@@ -161,17 +161,17 @@ export async function seed() {
           email: 'info@jazzbucharest.ro',
           phone: '+40 21 987 6543',
         },
-        images: ['https://example.com/jazz-evenings.jpg'],
+        images: ['https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=800&q=80'],
         tags: ['jazz', 'music', 'autumn'],
       },
     ];
     console.log('Inserting events:', eventData);
     const insertedEvents = await db.insert(events).values(eventData).returning();
-    console.log(`✅ Inserted ${insertedEvents.length} events`, insertedEvents);
+    console.log(` Inserted ${insertedEvents.length} events`, insertedEvents);
 
-    console.log('✅ Database seeding completed!');
+    console.log(' Database seeding completed!');
   } catch (error) {
-    console.error('❌ Error during seeding:', error);
+    console.error(' Error during seeding:', error);
   }
 }
 

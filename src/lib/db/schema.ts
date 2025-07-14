@@ -217,6 +217,40 @@ export const groupParticipants = pgTable('group_participants', {
   userIdx: index('group_participant_user_idx').on(table.userId),
 }));
 
+// Friend Requests
+export const friendRequests = pgTable('friend_requests', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  fromUserId: text('from_user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  toUserId: text('to_user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  status: text('status').default('pending'), // pending, accepted, rejected
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Friends (accepted friendships)
+export const friends = pgTable('friends', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  friendId: text('friend_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+// Tickets (user event tickets)
+export const tickets = pgTable('tickets', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  eventId: uuid('event_id').references(() => events.id, { onDelete: 'cascade' }).notNull(),
+  purchaseDate: timestamp('purchase_date').defaultNow().notNull(),
+});
+
+// Itinerary Participants (collaborative itineraries)
+export const itineraryParticipants = pgTable('itinerary_participants', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  itineraryId: uuid('itinerary_id').references(() => itineraries.id, { onDelete: 'cascade' }).notNull(),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  role: text('role').default('participant'), // participant, owner
+  joinedAt: timestamp('joined_at').defaultNow().notNull(),
+});
+
 // Define relations
 export const usersRelations = relations(users, ({ many }) => ({
   itineraries: many(itineraries),

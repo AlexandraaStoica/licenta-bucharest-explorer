@@ -8,6 +8,13 @@
       "when": 1752444482606,
       "tag": "0000_lame_violations",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1752491824969,
+      "tag": "0001_tan_mandroid",
+      "breakpoints": true
     }
   ]
 }

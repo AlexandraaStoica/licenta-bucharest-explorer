@@ -1,5 +1,5 @@
 import { db } from './index';
-import { eq, and, desc, asc, sql, gte } from 'drizzle-orm';
+import { eq, and, desc, asc, sql, gte, or } from 'drizzle-orm';
 import {
   users,
   categories,
@@ -14,6 +14,10 @@ import {
   userFavorites,
   groupItineraries,
   groupParticipants,
+  friendRequests,
+  friends,
+  tickets,
+  itineraryParticipants,
 } from './schema';
 
 // User queries
@@ -433,4 +437,80 @@ export async function joinGroupItinerary(groupItineraryId: string, userId: strin
     userId,
     role: 'participant',
   }).returning();
+} 
+
+// Collaborative Itineraries API
+
+export async function inviteParticipant(itineraryId: string, userId: string) {
+  // Prevent duplicate
+  const existing = await db.query.itineraryParticipants.findFirst({ where: and(eq(itineraryParticipants.itineraryId, itineraryId), eq(itineraryParticipants.userId, userId)) });
+  if (existing) throw new Error('User already invited or joined');
+  return db.insert(itineraryParticipants).values({ itineraryId, userId }).returning();
+}
+
+export async function getItineraryParticipants(itineraryId: string) {
+  return db.query.itineraryParticipants.findMany({ where: eq(itineraryParticipants.itineraryId, itineraryId) });
+}
+
+export async function joinItinerary(itineraryId: string, userId: string) {
+  return inviteParticipant(itineraryId, userId);
+}
+
+export async function leaveItinerary(itineraryId: string, userId: string) {
+  return db.delete(itineraryParticipants).where(and(eq(itineraryParticipants.itineraryId, itineraryId), eq(itineraryParticipants.userId, userId)));
+}
+
+// Friend Requests API
+
+export async function sendFriendRequest(fromUserId: string, toUserId: string) {
+  // Prevent duplicate requests or self-request
+  if (fromUserId === toUserId) throw new Error('Cannot send friend request to yourself');
+  const existing = await db.query.friendRequests.findFirst({
+    where: and(eq(friendRequests.fromUserId, fromUserId), eq(friendRequests.toUserId, toUserId), eq(friendRequests.status, 'pending')),
+  });
+  if (existing) throw new Error('Friend request already sent');
+  return db.insert(friendRequests).values({ fromUserId, toUserId, status: 'pending' }).returning();
+}
+
+export async function acceptFriendRequest(requestId: string) {
+  const req = await db.query.friendRequests.findFirst({ where: eq(friendRequests.id, requestId) });
+  if (!req || req.status !== 'pending') throw new Error('Invalid or already handled request');
+  await db.update(friendRequests).set({ status: 'accepted' }).where(eq(friendRequests.id, requestId));
+  // Add both directions to friends table
+  await db.insert(friends).values([
+    { userId: req.fromUserId, friendId: req.toUserId },
+    { userId: req.toUserId, friendId: req.fromUserId },
+  ]);
+}
+
+export async function rejectFriendRequest(requestId: string) {
+  const req = await db.query.friendRequests.findFirst({ where: eq(friendRequests.id, requestId) });
+  if (!req || req.status !== 'pending') throw new Error('Invalid or already handled request');
+  await db.update(friendRequests).set({ status: 'rejected' }).where(eq(friendRequests.id, requestId));
+}
+
+export async function getFriendRequests(userId: string) {
+  // Incoming and outgoing
+  return db.query.friendRequests.findMany({
+    where: or(eq(friendRequests.fromUserId, userId), eq(friendRequests.toUserId, userId)),
+    orderBy: (fr) => fr.createdAt,
+  });
+}
+
+export async function getFriends(userId: string) {
+  // List of accepted friends
+  return db.query.friends.findMany({ where: eq(friends.userId, userId) });
+} 
+
+// Tickets API
+
+export async function purchaseTicket(userId: string, eventId: string) {
+  // Prevent duplicate ticket
+  const existing = await db.query.tickets.findFirst({ where: and(eq(tickets.userId, userId), eq(tickets.eventId, eventId)) });
+  if (existing) throw new Error('Ticket already purchased');
+  return db.insert(tickets).values({ userId, eventId }).returning();
+}
+
+export async function getUserTickets(userId: string) {
+  return db.query.tickets.findMany({ where: eq(tickets.userId, userId) });
 } 

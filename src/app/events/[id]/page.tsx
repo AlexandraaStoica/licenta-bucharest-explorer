@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { getEventById } from '@/lib/db/queries';
 import MapSection from './MapSection';
+import PurchaseTicketButton from '@/components/PurchaseTicketButton';
 
 interface EventDetailPageProps {
   params: { id: string };
@@ -26,6 +27,9 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
       </div>
       <div>
         <strong>Date:</strong> {event.startDate ? new Date(event.startDate).toLocaleString() : 'No date'}
+      </div>
+      <div className="mt-6">
+        <PurchaseTicketButton eventId={event.id} />
       </div>
     </div>
   );

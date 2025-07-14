@@ -1,7 +1,20 @@
 import Link from 'next/link';
 import { MapPin, Calendar, Star, Users, ArrowRight } from 'lucide-react';
+import { getAllCategories } from '@/lib/db/queries';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const categories = await getAllCategories();
+  // Map color classes for each category name
+  const colorMap: Record<string, string> = {
+    'Museums': 'from-blue-500 to-blue-600',
+    'Historical Buildings': 'from-purple-500 to-purple-600',
+    'Restaurants': 'from-orange-500 to-orange-600',
+    'Nightlife': 'from-pink-500 to-pink-600',
+    'Galleries': 'from-red-500 to-red-600',
+    'Parks & Gardens': 'from-green-500 to-green-600',
+    'Shopping': 'from-indigo-500 to-indigo-600',
+    'Theaters': 'from-yellow-500 to-yellow-600',
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Hero Section */}
@@ -53,7 +66,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center p-6 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100">
+            <Link href="/locations" className="text-center p-6 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 hover:shadow-lg transition-all duration-200 block">
               <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <MapPin className="h-8 w-8 text-white" />
               </div>
@@ -63,9 +76,9 @@ export default function HomePage() {
               <p className="text-gray-600">
                 Explore museums, restaurants, historical sites, and more with detailed information and reviews.
               </p>
-            </div>
+            </Link>
 
-            <div className="text-center p-6 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100">
+            <Link href="/events" className="text-center p-6 rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 hover:shadow-lg transition-all duration-200 block">
               <div className="w-16 h-16 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Calendar className="h-8 w-8 text-white" />
               </div>
@@ -75,9 +88,9 @@ export default function HomePage() {
               <p className="text-gray-600">
                 Find and book tickets for cultural events, concerts, exhibitions, and special activities.
               </p>
-            </div>
+            </Link>
 
-            <div className="text-center p-6 rounded-xl bg-gradient-to-br from-green-50 to-green-100">
+            <Link href="/itineraries" className="text-center p-6 rounded-xl bg-gradient-to-br from-green-50 to-green-100 hover:shadow-lg transition-all duration-200 block">
               <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Star className="h-8 w-8 text-white" />
               </div>
@@ -87,9 +100,9 @@ export default function HomePage() {
               <p className="text-gray-600">
                 Create personalized day-by-day travel plans tailored to your interests and schedule.
               </p>
-            </div>
+            </Link>
 
-            <div className="text-center p-6 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100">
+            <Link href="/community" className="text-center p-6 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 hover:shadow-lg transition-all duration-200 block">
               <div className="w-16 h-16 bg-orange-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="h-8 w-8 text-white" />
               </div>
@@ -99,7 +112,7 @@ export default function HomePage() {
               <p className="text-gray-600">
                 Plan group trips with friends and share your experiences with the community.
               </p>
-            </div>
+            </Link>
           </div>
         </div>
       </section>
@@ -115,26 +128,14 @@ export default function HomePage() {
               Find exactly what you&apos;re looking for in Bucharest
             </p>
           </div>
-
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[
-              { name: 'Museums', color: 'from-blue-500 to-blue-600', icon: '🏛️' },
-              { name: 'Historical Buildings', color: 'from-purple-500 to-purple-600', icon: '🏰' },
-              { name: 'Restaurants', color: 'from-orange-500 to-orange-600', icon: '🍽️' },
-              { name: 'Nightlife', color: 'from-pink-500 to-pink-600', icon: '🌙' },
-              { name: 'Galleries', color: 'from-red-500 to-red-600', icon: '🎨' },
-              { name: 'Parks & Gardens', color: 'from-green-500 to-green-600', icon: '🌳' },
-              { name: 'Shopping', color: 'from-indigo-500 to-indigo-600', icon: '🛍️' },
-              { name: 'Theaters', color: 'from-yellow-500 to-yellow-600', icon: '🎭' },
-            ].map((category) => (
+            {categories.map(category => (
               <Link
-                key={category.name}
-                href={`/locations?category=${category.name.toLowerCase().replace(/\s+/g, '-')}`}
+                key={category.id}
+                href={`/locations?categoryId=${category.id}`}
                 className="group block p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-1"
               >
-                <div className={`w-12 h-12 bg-gradient-to-r ${category.color} rounded-lg flex items-center justify-center mb-4 text-2xl`}>
-                  {category.icon}
-                </div>
+                <div className={`w-12 h-12 bg-gradient-to-r ${colorMap[category.name] || 'from-gray-400 to-gray-600'} rounded-lg flex items-center justify-center mb-4 text-2xl`}></div>
                 <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
                   {category.name}
                 </h3>

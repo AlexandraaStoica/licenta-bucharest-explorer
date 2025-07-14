@@ -51,29 +51,21 @@ export async function POST(req: NextRequest) {
     // Handle user.created event
     if (eventType === 'user.created') {
       const { id, email_addresses, first_name, last_name, image_url } = (evt as { data: { id: string, email_addresses: { email_address: string }[], first_name: string, last_name: string, image_url: string } }).data;
-      
-      console.log('Creating user with data:', {
+      const userData = {
         id,
-        email: email_addresses?.[0]?.email_address,
+        email: email_addresses?.[0]?.email_address || "",
         firstName: first_name,
         lastName: last_name,
         avatarUrl: image_url,
-      });
-
+      };
+      console.log('Attempting to insert user:', userData);
       try {
-        const result = await createUser({
-          id,
-          email: email_addresses?.[0]?.email_address || "",
-          firstName: first_name,
-          lastName: last_name,
-          avatarUrl: image_url,
-        });
-
+        const result = await createUser(userData);
         console.log('User created successfully:', result);
         return NextResponse.json({ success: true, user: result });
       } catch (dbError) {
         console.error('Database error creating user:', dbError);
-        return NextResponse.json({ success: false, error: 'Database error' }, { status: 500 });
+        return NextResponse.json({ success: false, error: 'Database error', details: dbError instanceof Error ? dbError.message : dbError }, { status: 500 });
       }
     }
 
@@ -87,9 +79,9 @@ export async function POST(req: NextRequest) {
     console.log('Unhandled event type:', eventType);
     return NextResponse.json({ success: true, message: 'Event received but not handled' });
 
-      } catch (error) {
-      console.error('Webhook error:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
-    }
+  } catch (error) {
+    console.error('Webhook error:', error);
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json({ success: false, error: errorMessage }, { status: 500 });
+  }
 } 

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 import Link from "next/link";
+import UserSyncer from "@/components/UserSyncer";
 
 const geist = Geist({
   variable: "--font-geist-sans",
@@ -49,6 +50,7 @@ export default function RootLayout({
               <Link href="/sign-up" className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">Sign Up</Link>
             </SignedOut>
             <SignedIn>
+              <UserSyncer />
               <UserButton afterSignOutUrl="/" />
             </SignedIn>
           </header>

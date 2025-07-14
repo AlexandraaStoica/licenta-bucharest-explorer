@@ -4,13 +4,16 @@ import { getAllCategories, getAllLocations } from '@/lib/db/queries';
 import { getRatingColor, getPriceRangeColor } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
+import { redirect } from 'next/navigation';
 
-async function LocationsList() {
+// Accept searchParams for filtering
+async function LocationsList({ searchParams }: { searchParams: { categoryId?: string } }) {
   const [categories, locations] = await Promise.all([
     getAllCategories(),
-    getAllLocations()
+    getAllLocations({ categoryId: searchParams.categoryId })
   ]);
-  
+  const selectedCategoryId = searchParams.categoryId || '';
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="text-center mb-12">
@@ -54,15 +57,15 @@ async function LocationsList() {
         <h2 className="text-2xl font-semibold text-gray-900 mb-6">Browse by Category</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
           {categories.map((category) => (
-            <button
+            <Link
               key={category.id}
-              className="p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 text-center"
+              href={`/locations?categoryId=${category.id}`}
+              scroll={false}
+              className={`p-4 bg-white rounded-lg border ${selectedCategoryId === category.id ? 'border-blue-500' : 'border-gray-200'} hover:border-blue-300 hover:shadow-md transition-all duration-200 text-center`}
             >
-              <div className="w-8 h-8 mx-auto mb-2 text-2xl">
-                {category.icon || '📍'}
-              </div>
+              <div className="w-8 h-8 mx-auto mb-2 text-2xl"></div>
               <span className="text-sm font-medium text-gray-700">{category.name}</span>
-            </button>
+            </Link>
           ))}
         </div>
       </div>
@@ -119,7 +122,7 @@ async function LocationsList() {
                     <span className="text-sm font-medium text-gray-700">
                       {location.category?.name || 'Uncategorized'}
                     </span>
-                    <span className={`text-sm font-medium ${getPriceRangeColor(location.priceRange || '€€')}`}>
+                    <span className={`text-sm font-medium ${getPriceRangeColor(location.priceRange || '€€')}`}> 
                       {location.priceRange || '€€'}
                     </span>
                   </div>
@@ -129,7 +132,7 @@ async function LocationsList() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <div className="text-gray-400 text-6xl mb-4">📍</div>
+            <div className="text-gray-400 text-6xl mb-4"></div>
             <h3 className="text-xl font-medium text-gray-900 mb-2">No locations found</h3>
             <p className="text-gray-600">Check back later for new locations to explore!</p>
           </div>
@@ -139,7 +142,10 @@ async function LocationsList() {
   );
 }
 
-export default function LocationsPage() {
+import { cookies } from 'next/headers';
+import { parse } from 'querystring';
+
+export default function LocationsPage({ searchParams }: { searchParams: { categoryId?: string } }) {
   return (
     <div className="min-h-screen bg-gray-50">
       <Suspense fallback={
@@ -150,7 +156,7 @@ export default function LocationsPage() {
           </div>
         </div>
       }>
-        <LocationsList />
+        <LocationsList searchParams={searchParams} />
       </Suspense>
     </div>
   );
